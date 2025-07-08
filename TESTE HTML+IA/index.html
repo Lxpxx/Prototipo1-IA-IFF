@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot Legislação - Llama 3</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #chat { max-width: 600px; margin: auto; }
+        .msg { margin-bottom: 10px; }
+        .user { color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <div id="chat"></div>
+    <input type="text" id="input" placeholder="Digite sua dúvida..." style="width: 80%;">
+    <button onclick="send()">Enviar</button>
+
+    <script>
+        function addMsg(text, who) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = 'msg ' + who;
+            div.textContent = (who === 'user' ? 'Você: ' : 'Bot: ') + text;
+            chat.appendChild(div);
+            
+            //tira
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function send() {
+            const input = document.getElementById('input');
+            const text = input.value.trim();
+            if (!text) return;
+            addMsg(text, 'user');
+            input.value = '';
+            const res = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: text })
+            });
+            const data = await res.json();
+            addMsg(data.response, 'bot');
+        }
+    </script>
+</body>
+</html> 
